@@ -48,6 +48,7 @@ urlpatterns = [
     path('fracas_admin/', include('fracas_admin.urls')),
     
     path('',Index.as_view(),name='index'),
+    path('userlogin/',UserLogin.as_view(),name='userlogin'),
     path('login/<int:id>/',Login.as_view(),name='login'),
     path('logout/',Logout.as_view(),name='logout'),
     path('changepassword/',ChangePassword.as_view(),name='changepassword'),

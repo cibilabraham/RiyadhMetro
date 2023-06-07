@@ -19,66 +19,38 @@
 {% load i18n %}
 
 <body>
-<style>
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-.div-container {
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(201, 237, 220, 0.5);
-    padding: 20px;
-}
-
-.centered-text {
-    text-align: center;
-    color: #10827d;
-    font-weight: 700;
-}
-
-.centered-text-a {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    text-align: center;
-    color: #10827d;
-}
-
-a {
-    text-decoration: none !important;
-    color: inherit;
-}
-
-.rounded-corner {
-    border-top-left-radius: 50px;
-    border-bottom-right-radius: 50px;
-}
-</style>
 
 <!-- Container -->
 <div style="background-image: url('{% static "asser-optima-landingpage.png" %}'); height: 100vh; background-repeat: no-repeat; background-size:cover;">
 
-  
+    <!-- Header -->
+    <div class="row">
+        <div class="col-sm-6 col-lg-6" align="left">
+            <h3 id="dashboard-h1" style="color:white">Welcome to Asset Optima</h3>
+        </div>
+        <div class="col-sm-6 col-lg-6" align="right">
+            <a href="/login/1/" id="dashboard-a" class="btn btn-success">Super user login</a>
+        </div>
+    </div>
     <!-- END Header -->
     <div class="container">
-
-        <div class="col-sm-4 div-container rounded-corner" >
-
-            <h1 class="centered-text">CJV Riyadh <br> Metro</h1>
-
-
-
-            <a href="/login/1/" class="centered-text-a">
-                <h3 class="centered-text">User Login</h3>
+        <div class="row">
+            <div class="col-sm-4">
+            <a href="/login/2/">
+                <input type="button" id="dashboard-button" class="btn btn-info" value="P5-Signalling">
             </a>
+            </div>
+            <div class="col-sm-4">
+            <a href="/login/3/">
+                <input type="button" id="dashboard-button" class="btn btn-info" value="P5A-TPWS">
+            </a>
+            </div>
+            <div class="col-sm-4">
+            <a href="/login/4/">
+                <input type="button" id="dashboard-button" class="btn btn-info" value="Telecom">
+            </a>
+            </div>
         </div>
-          
-      
     </div>
     
 </div>

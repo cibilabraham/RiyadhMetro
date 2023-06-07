@@ -35,6 +35,14 @@ class Index(View):
             return redirect('/dashboard/')
         return render(request, self.template_name)
     
+class UserLogin(View):
+    template_name = 'indexHome.html'
+    
+    def get(self, request, *args, **kwargs):
+        if 'login' in request.session:
+            return redirect('/dashboard/')
+        return render(request, self.template_name)
+    
 class Login(View):
     """ It was a view for the comp login view """
     template_name = 'login.html'
@@ -59,40 +67,32 @@ class Login(View):
                     if UserProfile.objects.filter(user_id=UsersData.id,is_disable=0,is_active=0).exists():
                         user_data = UserProfile.objects.filter(user_id=UsersData.id)
                         for u_data in user_data:
-                            if id == 1:
-                                if id == u_data.user_role_id:
-                                    auth.login(request, auth_user)
-                                    request.session['P_id'] = 0
-                                    request.session['login'] = 'true'
-                                    request.session['email'] = email
-                                    request.session['user_Role'] = id
-                                    request.session['user_ID'] = u_data.user_id
-                                    now = datetime.now()
-                                    current_time = now.strftime("%H:%M:%S")
-                                    h = history(user_id=u_data.id,P_id=0,date=date.today(),time=current_time,message="Login",function_name="Manage Users")
-                                    h.save()
-                                    return redirect('/dashboard/')
-                                else:
-                                    message = 'Invalid credentials given'
-                                    return render(request, self.template_name, {"message": message,'id':id})
+                            if 1 == u_data.user_role_id:
+                                auth.login(request, auth_user)
+                                request.session['P_id'] = 0
+                                request.session['login'] = 'true'
+                                request.session['email'] = email
+                                request.session['user_Role'] = id
+                                request.session['user_ID'] = u_data.user_id
+                                now = datetime.now()
+                                current_time = now.strftime("%H:%M:%S")
+                                h = history(user_id=u_data.id,P_id=0,date=date.today(),time=current_time,message="Login",function_name="Manage Users")
+                                h.save()
+                                return redirect('/dashboard/')
                             else:
-                                if u_data.product_id_id == id-1 and u_data.user_role_id != 1:
-                                    auth.login(request, auth_user)
-                                    request.session['P_id'] = u_data.product_id_id
-                                    x=Product.objects.filter(product_id=u_data.product_id_id)
-                                    request.session['P_name'] = x[0].product_name
-                                    request.session['login'] = 'true'
-                                    request.session['email'] = email
-                                    request.session['user_Role'] = u_data.user_role_id
-                                    request.session['user_ID'] = u_data.user_id
-                                    now = datetime.now()
-                                    current_time = now.strftime("%H:%M:%S")
-                                    h = history(user_id=u_data.id,P_id=u_data.product_id_id,date=date.today(),time=current_time,message="Login",function_name="Manage Users")
-                                    h.save()
-                                    return redirect('/dashboard/')
-                                else:
-                                    message = 'Invalid credentials given'
-                                    return render(request, self.template_name, {"message": message,'id':id})
+                                auth.login(request, auth_user)
+                                request.session['P_id'] = u_data.product_id_id
+                                x=Product.objects.filter(product_id=u_data.product_id_id)
+                                request.session['P_name'] = x[0].product_name
+                                request.session['login'] = 'true'
+                                request.session['email'] = email
+                                request.session['user_Role'] = u_data.user_role_id
+                                request.session['user_ID'] = u_data.user_id
+                                now = datetime.now()
+                                current_time = now.strftime("%H:%M:%S")
+                                h = history(user_id=u_data.id,P_id=u_data.product_id_id,date=date.today(),time=current_time,message="Login",function_name="Manage Users")
+                                h.save()
+                                return redirect('/dashboard/')
                     else:
                         message = 'Invalid credentials given'
                         return render(request, self.template_name, {"message": message,'id':id})
