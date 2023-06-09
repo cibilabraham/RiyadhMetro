@@ -563,8 +563,6 @@ class MTBFvsTimeReportView(View):
         scale=[]
         asset_types = []
         pbs_asset_types = []
-
-        print('===========++++++++++++============')
         
         if req.get('start_date') !="" and req.get('end_date') !="":
             start_date = datetime.datetime.strptime(req.get('start_date'), '%d/%m/%Y').strftime('%Y-%m-%d')
@@ -577,12 +575,6 @@ class MTBFvsTimeReportView(View):
         P_id = request.session['P_id']
         user_ID = request.session['user_ID']
         user_Role = request.session.get('user_Role')
-
-        print(start_date + '  << start_date')
-        print(end_date + ' << end_date')
-
-        print('===========++++++++++++============')
-
         
         if user_Role == 1:
             Asset_data=Asset.objects.filter(is_active=0)
@@ -662,7 +654,7 @@ class MTBFvsTimeReportView(View):
                 formated_start_date = (date.today() - offsets.YearBegin()).date()
                 formated_end_date = (date.today() + offsets.YearEnd()).date()
             number_of_days = (formated_end_date-formated_start_date).days
-
+           
             # To get scale dates. If number of days greater than 150days scales took as months and otherwise took as weeks
             first_week_day = formated_start_date.weekday()
             first_week_sunday = formated_start_date + timedelta(days=(5-first_week_day))
@@ -687,12 +679,10 @@ class MTBFvsTimeReportView(View):
             else:
                 Hightest_date_of_failure = FailureData.objects.filter(asset_config_id__asset_type__in=asset_types,is_active=0).exclude(failure_type='Other').order_by('-date')
 
-            # print(Hightest_date_of_failure[0].date,'Hightest_date_of_failure')
+            print(Hightest_date_of_failure[0].date,'Hightest_date_of_failure')
             Hightest_date_of_failure = str(Hightest_date_of_failure[0].date)
             Hightest_date_of_failure = datetime.datetime.strptime(Hightest_date_of_failure, '%Y-%m-%d').strftime('%Y-%m-%d')
-
-            week_number = math.ceil(number_of_days / 7)
-            number_of_days_count_chk = number_of_days
+           
 
             for i in range(1, week_number+1):
                 if FN_NAME == 'two':
@@ -701,37 +691,18 @@ class MTBFvsTimeReportView(View):
                     lru_population_hours = (24*7)*i # to get LRU Weekely Hours
                 actual_mtbf_value = 'null'
                 # to get start/end dates of current week
-
-             
                 if i == 1:
                     week_start_date = formated_start_date
-                    if number_of_days_count_chk < 6:
-                        week_end_date = week_start_date + timedelta(days=number_of_days_count_chk) 
-                    else:
-                        week_end_date = week_start_date + timedelta(days=6) 
-                    number_of_days_count_chk = number_of_days_count_chk - 7
+                    
+                elif i == 2:
+                    week_start_date = second_week_start_date
                 else:
                     week_start_date = week_end_date + timedelta(days=1)
-                    if number_of_days_count_chk < 6:
-                        week_end_date = week_start_date + timedelta(days=number_of_days_count_chk) 
-                    else:
-                        week_end_date = week_start_date + timedelta(days=6)  
-                    number_of_days_count_chk = number_of_days_count_chk - 7
-            
+                if i ==1:
+                    week_end_date = first_week_sunday
+                else:
+                    week_end_date = week_start_date + timedelta(days=6) 
 
-                # if i == 1:
-                #     week_start_date = formated_start_date
-                    
-                # elif i == 2:
-                #     week_start_date = second_week_start_date
-                # else:
-                #     week_start_date = week_end_date + timedelta(days=1)
-                # if i ==1:
-                #     week_end_date = first_week_sunday
-                # else:
-                #     week_end_date = week_start_date + timedelta(days=6) 
-
-              
                 failure_count = 0
                 if lru_type and lru_type!="all":
                     failure_count = FailureData.objects.filter(asset_config_id__asset_type=lru_type, date__range=[week_start_date,week_end_date],is_active=0).exclude(failure_type='Other').count()
@@ -743,49 +714,21 @@ class MTBFvsTimeReportView(View):
                 if cum_actual_failure_count != 0:
                     actual_mtbf_value = round(lru_population_hours/cum_actual_failure_count,2)
 
-                # print(week_end_date,'week_end_date')
+                print(week_end_date,'week_end_date')
                 week_end_date1 = datetime.datetime.strptime(str(week_end_date), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
-                # print(Hightest_date_of_failure,'Hightest_date_of_failure')
-
-                print("0000000000000000000000000000000000")
-
-                print(Hightest_date_of_failure)
-                print(failure_count)
-
-
-                # if week_end_date1 < Hightest_date_of_failure or failure_count != 0 :
-                #     findUnit = PBSUnit.objects.filter()
-                #     if findUnit[0].MTBFMTBSAF == 'days':
-                #         if actual_mtbf_value != 'null':
-                #             actual_mtbf_value = round(actual_mtbf_value/24,2)                        
-                #     elif findUnit[0].MTBFMTBSAF == 'mins':
-                #         if actual_mtbf_value != 'null':
-                #             actual_mtbf_value = actual_mtbf_value *60
-                #     else:
-                #         actual_mtbf_value = actual_mtbf_value
-                # else:
-                #     actual_mtbf_value = 'null'
-
-                findUnit = PBSUnit.objects.filter()
-                if findUnit[0].MTBFMTBSAF == 'days':
-                    if actual_mtbf_value != 'null':
-                        actual_mtbf_value = round(actual_mtbf_value/24,2)                        
-                elif findUnit[0].MTBFMTBSAF == 'mins':
-                    if actual_mtbf_value != 'null':
-                        actual_mtbf_value = actual_mtbf_value *60
+                print(Hightest_date_of_failure,'Hightest_date_of_failure')
+                if week_end_date1 < Hightest_date_of_failure or failure_count != 0 :
+                    findUnit = PBSUnit.objects.filter()
+                    if findUnit[0].MTBFMTBSAF == 'days':
+                        if actual_mtbf_value != 'null':
+                            actual_mtbf_value = round(actual_mtbf_value/24,2)                        
+                    elif findUnit[0].MTBFMTBSAF == 'mins':
+                        if actual_mtbf_value != 'null':
+                            actual_mtbf_value = actual_mtbf_value *60
+                    else:
+                        actual_mtbf_value = actual_mtbf_value
                 else:
-                    actual_mtbf_value = actual_mtbf_value
-
-                
-                
-                
-                print(week_start_date)
-                print(week_end_date)
-
-                print(week_end_date1)
-                print(lru_population_hours)
-                print(actual_mtbf_value)
-                print(cum_actual_failure_count)
+                    actual_mtbf_value = 'null'
 
                 data.append({'x':week_start_date.strftime('%Y-%m-%d'), 'y':actual_mtbf_value})
                 data1.append({'x':week_start_date.strftime('%Y-%m-%d'), 'y':pbs_mtbf_value})
