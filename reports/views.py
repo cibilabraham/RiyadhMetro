@@ -2052,7 +2052,7 @@ class AvailabilityView(View):
                 week_end_date1 = datetime.datetime.strptime(str(week_end_date), '%Y-%m-%d').strftime('%Y-%m-%d')
                 print(Hightest_date_of_failure,'Hightest_date_of_failure')
                 if week_end_date1 < Hightest_date_of_failure or Find_Week_wise_Service_Delay != None:
-                    Avaiability = Avaiability
+                    Avaiability = round( Avaiability ,2)  
                 else:
                     Avaiability = 'null'
 
