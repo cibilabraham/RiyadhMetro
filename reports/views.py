@@ -913,6 +913,9 @@ class LogPlotMtbfReportView(View):
             pbs_mtbf_value = round(np.log(pbs_mtbf_value),2)
             Ii = 1
 
+            week_number = math.ceil(number_of_days / 7)
+            number_of_days_count_chk = number_of_days
+
             for i in range(1, week_number+1):
                 if FN_NAME == 'two':
                     lru_population_hours = (asset_count*24*7)*i # to get LRU Weekely Hours
@@ -920,17 +923,22 @@ class LogPlotMtbfReportView(View):
                     lru_population_hours = (24*7)*i # to get LRU Weekely Hours
                 actual_mtbf_value = 'null'
                 # to get start/end dates of current week
+                
                 if i == 1:
                     week_start_date = formated_start_date
-                    
-                elif i == 2:
-                    week_start_date = second_week_start_date
+                    if number_of_days_count_chk < 6:
+                        week_end_date = week_start_date + timedelta(days=number_of_days_count_chk) 
+                    else:
+                        week_end_date = week_start_date + timedelta(days=6) 
+                    number_of_days_count_chk = number_of_days_count_chk - 7
                 else:
                     week_start_date = week_end_date + timedelta(days=1)
-                if i ==1:
-                    week_end_date = first_week_sunday
-                else:
-                    week_end_date = week_start_date + timedelta(days=6) 
+                    if number_of_days_count_chk < 6:
+                        week_end_date = week_start_date + timedelta(days=number_of_days_count_chk) 
+                    else:
+                        week_end_date = week_start_date + timedelta(days=6)  
+                    number_of_days_count_chk = number_of_days_count_chk - 7
+            
 
                 failure_count = 0
                 if lru_type and lru_type!="all":
@@ -955,20 +963,19 @@ class LogPlotMtbfReportView(View):
 
                 week_end_date1 = datetime.datetime.strptime(str(week_end_date), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
                 
-                if week_end_date1 < Hightest_date_of_failure or failure_count != 0:
-                    findUnit = PBSUnit.objects.filter()
-                    if findUnit[0].MTBFMTBSAF == 'days':
-                        if actual_mtbf_value != 'null':
-                            actual_mtbf_value = round(actual_mtbf_value/24,2)                        
-                    elif findUnit[0].MTBFMTBSAF == 'mins':
-                        if actual_mtbf_value != 'null':
-                            actual_mtbf_value = actual_mtbf_value *60
-                    else:
-                        actual_mtbf_value = actual_mtbf_value
-                    last_x_point = lru_population_hours
-                    last_y_point = actual_mtbf_value
+                findUnit = PBSUnit.objects.filter()
+                if findUnit[0].MTBFMTBSAF == 'days':
+                    if actual_mtbf_value != 'null':
+                        actual_mtbf_value = round(actual_mtbf_value/24,2)                        
+                elif findUnit[0].MTBFMTBSAF == 'mins':
+                    if actual_mtbf_value != 'null':
+                        actual_mtbf_value = actual_mtbf_value *60
                 else:
-                    actual_mtbf_value = 'null'
+                    actual_mtbf_value = actual_mtbf_value
+                last_x_point = lru_population_hours
+                last_y_point = actual_mtbf_value
+               
+
                 if Ii == 1:
                     if actual_mtbf_value != 'null':
                         first_x_point = lru_population_hours
@@ -992,6 +999,9 @@ class LogPlotMtbfReportView(View):
                 slope = (last_y_point - first_y_point) / (last_x_point - first_x_point)
             print(slope,'slope')
             LinerPointFlow = 0
+
+            number_of_days_count_chk = number_of_days
+
             for i in range(1, week_number+1):
                 if FN_NAME == 'two':
                     lru_population_hours = (asset_count*24*7)*i # to get LRU Weekely Hours
@@ -1001,15 +1011,18 @@ class LogPlotMtbfReportView(View):
                 # to get start/end dates of current week
                 if i == 1:
                     week_start_date = formated_start_date
-                    
-                elif i == 2:
-                    week_start_date = second_week_start_date
+                    if number_of_days_count_chk < 6:
+                        week_end_date = week_start_date + timedelta(days=number_of_days_count_chk) 
+                    else:
+                        week_end_date = week_start_date + timedelta(days=6) 
+                    number_of_days_count_chk = number_of_days_count_chk - 7
                 else:
                     week_start_date = week_end_date + timedelta(days=1)
-                if i ==1:
-                    week_end_date = first_week_sunday
-                else:
-                    week_end_date = week_start_date + timedelta(days=6) 
+                    if number_of_days_count_chk < 6:
+                        week_end_date = week_start_date + timedelta(days=number_of_days_count_chk) 
+                    else:
+                        week_end_date = week_start_date + timedelta(days=6)  
+                    number_of_days_count_chk = number_of_days_count_chk - 7
 
                 failure_count = 0
                 if lru_type and lru_type!="all":
@@ -1289,6 +1302,10 @@ class CumalativeMtbfReportView(View):
             flag = False
             last_actual_values = []
             last_actual_weeks = []
+
+            week_number = math.ceil(number_of_days / 7)
+            number_of_days_count_chk = number_of_days
+
             for week in range(1, week_number+1):
 
                 # to get start/end dates of current week
@@ -1306,10 +1323,18 @@ class CumalativeMtbfReportView(View):
 
                 if week == 1:
                     week_start_date = defect_start_date
+                    if number_of_days_count_chk < 6:
+                        week_end_date = week_start_date + timedelta(days=number_of_days_count_chk) 
+                    else:
+                        week_end_date = week_start_date + timedelta(days=6) 
+                    number_of_days_count_chk = number_of_days_count_chk - 7
                 else:
                     week_start_date = week_end_date + timedelta(days=1)
-
-                week_end_date = week_start_date + timedelta(days=6)
+                    if number_of_days_count_chk < 6:
+                        week_end_date = week_start_date + timedelta(days=number_of_days_count_chk) 
+                    else:
+                        week_end_date = week_start_date + timedelta(days=6)  
+                    number_of_days_count_chk = number_of_days_count_chk - 7
                 
                 if lru_type and lru_type!="all":
                     defects = Defect.objects.filter(asset_type=lru_type, oem_target_date__range=[week_start_date,week_end_date])
@@ -1958,19 +1983,29 @@ class AvailabilityView(View):
             print(Hightest_date_of_failure[0].date,'Hightest_date_of_failure')
             Hightest_date_of_failure = str(Hightest_date_of_failure[0].date)
             Hightest_date_of_failure = datetime.datetime.strptime(Hightest_date_of_failure, '%Y-%m-%d').strftime('%Y-%m-%d')
+
+            week_number = math.ceil(number_of_days / 7)
+            number_of_days_count_chk = number_of_days
            
             for week in range(1, week_number+1):
+               
                 if week == 1:
                     week_start_date = start_dates
-                    
-                elif week == 2:
-                    week_start_date = second_week_start_date
+                    if number_of_days_count_chk < 6:
+                        week_end_date = week_start_date + timedelta(days=number_of_days_count_chk) 
+                    else:
+                        week_end_date = week_start_date + timedelta(days=6) 
+                    number_of_days_count_chk = number_of_days_count_chk - 7
                 else:
                     week_start_date = week_end_date + timedelta(days=1)
-                if week ==1:
-                    week_end_date = first_week_sunday
-                else:
-                    week_end_date = week_start_date + timedelta(days=6) 
+                    if number_of_days_count_chk < 6:
+                        week_end_date = week_start_date + timedelta(days=number_of_days_count_chk) 
+                    else:
+                        week_end_date = week_start_date + timedelta(days=6)  
+                    number_of_days_count_chk = number_of_days_count_chk - 7
+
+
+
                 print("----------------------")
                 print(week_start_date,'week_start_date')
                 print(week_end_date,'week_end_date')
