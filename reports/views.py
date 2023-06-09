@@ -719,18 +719,6 @@ class MTBFvsTimeReportView(View):
                     number_of_days_count_chk = number_of_days_count_chk - 7
             
 
-                # if i == 1:
-                #     week_start_date = formated_start_date
-                    
-                # elif i == 2:
-                #     week_start_date = second_week_start_date
-                # else:
-                #     week_start_date = week_end_date + timedelta(days=1)
-                # if i ==1:
-                #     week_end_date = first_week_sunday
-                # else:
-                #     week_end_date = week_start_date + timedelta(days=6) 
-
               
                 failure_count = 0
                 if lru_type and lru_type!="all":
@@ -747,24 +735,7 @@ class MTBFvsTimeReportView(View):
                 week_end_date1 = datetime.datetime.strptime(str(week_end_date), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
                 # print(Hightest_date_of_failure,'Hightest_date_of_failure')
 
-                print("0000000000000000000000000000000000")
-
-                print(Hightest_date_of_failure)
-                print(failure_count)
-
-
-                # if week_end_date1 < Hightest_date_of_failure or failure_count != 0 :
-                #     findUnit = PBSUnit.objects.filter()
-                #     if findUnit[0].MTBFMTBSAF == 'days':
-                #         if actual_mtbf_value != 'null':
-                #             actual_mtbf_value = round(actual_mtbf_value/24,2)                        
-                #     elif findUnit[0].MTBFMTBSAF == 'mins':
-                #         if actual_mtbf_value != 'null':
-                #             actual_mtbf_value = actual_mtbf_value *60
-                #     else:
-                #         actual_mtbf_value = actual_mtbf_value
-                # else:
-                #     actual_mtbf_value = 'null'
+            
 
                 findUnit = PBSUnit.objects.filter()
                 if findUnit[0].MTBFMTBSAF == 'days':
@@ -775,17 +746,6 @@ class MTBFvsTimeReportView(View):
                         actual_mtbf_value = actual_mtbf_value *60
                 else:
                     actual_mtbf_value = actual_mtbf_value
-
-                
-                
-                
-                print(week_start_date)
-                print(week_end_date)
-
-                print(week_end_date1)
-                print(lru_population_hours)
-                print(actual_mtbf_value)
-                print(cum_actual_failure_count)
 
                 data.append({'x':week_start_date.strftime('%Y-%m-%d'), 'y':actual_mtbf_value})
                 data1.append({'x':week_start_date.strftime('%Y-%m-%d'), 'y':pbs_mtbf_value})
