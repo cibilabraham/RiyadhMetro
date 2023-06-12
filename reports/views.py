@@ -737,15 +737,18 @@ class MTBFvsTimeReportView(View):
 
             
 
-                findUnit = PBSUnit.objects.filter()
-                if findUnit[0].MTBFMTBSAF == 'days':
-                    if actual_mtbf_value != 'null':
-                        actual_mtbf_value = round(actual_mtbf_value/24,2)                        
-                elif findUnit[0].MTBFMTBSAF == 'mins':
-                    if actual_mtbf_value != 'null':
-                        actual_mtbf_value = actual_mtbf_value *60
+                if week_end_date1 < Hightest_date_of_failure or failure_count != 0 :
+                    findUnit = PBSUnit.objects.filter()
+                    if findUnit[0].MTBFMTBSAF == 'days':
+                        if actual_mtbf_value != 'null':
+                            actual_mtbf_value = round(actual_mtbf_value/24,2)                        
+                    elif findUnit[0].MTBFMTBSAF == 'mins':
+                        if actual_mtbf_value != 'null':
+                            actual_mtbf_value = actual_mtbf_value *60
+                    else:
+                        actual_mtbf_value = actual_mtbf_value
                 else:
-                    actual_mtbf_value = actual_mtbf_value
+                    actual_mtbf_value = 'null'
 
                 data.append({'x':week_start_date.strftime('%Y-%m-%d'), 'y':actual_mtbf_value})
                 data1.append({'x':week_start_date.strftime('%Y-%m-%d'), 'y':pbs_mtbf_value})

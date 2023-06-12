@@ -348,6 +348,15 @@
     }
 
     function getChart(chartData){
+
+       
+        var system= $('select[name=system] option').filter(':selected').val()
+        if(system == "all"){
+            subsystem = "All Sub System(s)";
+        }else{
+            var subsystem = $('select[name=subsystem] option').filter(':selected').val()
+        }
+
         var startDate   = '' ;
         var endDate     = '';
         var timeUnite   = 'month'
@@ -401,7 +410,7 @@
                 responsive: true,
                 title:      {
                     display: true,
-                    text:    "Cumulative MTBF of selected subsystem vs Time",
+                    text:    "Cumulative MTBF of "+subsystem+" vs Time",
                     fontSize: 18,
                 },
                 legend: {
@@ -409,16 +418,16 @@
                 },
                 scales:     {
                     xAxes: [{
-                        type:"time",
-                        time:{
-                            format: timeFormat,
-                            tooltipFormat: 'll',
-                            unit: timeUnite
-                        },
-                        scaleLabel: {
-                            display:     false,
-                            labelString: 'Date'
-                        }
+                    type: "time",
+                    time: {
+                        unit: 'week',
+                        format: timeFormat,
+                        tooltipFormat: 'll',
+                    },
+                    scaleLabel: {
+                        display: false,
+                        labelString: 'Date',
+                    },
                     }],
                     yAxes: [{
                         scaleLabel: {

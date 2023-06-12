@@ -360,6 +360,14 @@
   
 
     function getChart(chartData){
+
+        var system= $('select[name=system] option').filter(':selected').val()
+        if(system == "all"){
+            subsystem = "All Sub System(s)";
+        }else{
+            var subsystem = $('select[name=subsystem] option').filter(':selected').val()
+        }
+
         $("#canvasDiv").css({"height": "500"});
         var stepSize = 10;
         var stepMax = 100;
@@ -433,7 +441,7 @@
                 responsive: true,
                 title:      {
                     display: true,
-                    text:    "Target Availability",
+                    text:    "Availability performance of "+subsystem,
                     fontSize: 18
                 },
                 legend: {

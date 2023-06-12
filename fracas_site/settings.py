@@ -103,7 +103,7 @@ WSGI_APPLICATION = 'fracas_site.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Hitachi_db',
+        'NAME': 'CJVRiyadhMetroDB',
         'USER': 'postgres',
         'PASSWORD': 'password',
         'HOST': 'localhost',
