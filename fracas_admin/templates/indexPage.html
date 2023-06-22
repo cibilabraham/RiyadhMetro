@@ -20,24 +20,33 @@
 
 <body>
 <style>
-.container {
+.container{
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    padding-top: 20%;
 }
 
 .div-container {
     justify-content: center;
     align-items: center;
-    background-color: rgba(201, 237, 220, 0.5);
-    padding: 20px;
+    /* background-color: rgba(201, 237, 220, 0.5); */
+    padding: 5px;
+    border: 2px solid black;
 }
 
 .centered-text {
     text-align: center;
-    color: #10827d;
-    font-weight: 700;
+    color: #475861;
+    font-weight: bold;
+}
+
+.centered-text-head {
+    text-align: center;
+    color: black;
+    font-weight: bold;
+    text-shadow: 4px 4px 14px #08f5d9;
 }
 
 .centered-text-a {
@@ -46,7 +55,7 @@
     align-items: center;
     height: 100%;
     text-align: center;
-    color: #10827d;
+    color: #475861;
 }
 
 a {
@@ -58,31 +67,69 @@ a {
     border-top-left-radius: 50px;
     border-bottom-right-radius: 50px;
 }
+
+.gradient-div {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(to top right, #68ebe3, #feefd8);
+}
+
+.image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url('{% static "asser-optima-landingpage.jpeg" %}');
+  background-repeat: no-repeat;
+  background-position: center;
+  /* Additional styling properties */
+  width: 100vw;
+  height: 80vh;
+  
+}
+
+
+
+
 </style>
 
-<!-- Container -->
-<div style="background-image: url('{% static "asser-optima-landingpage.png" %}'); height: 100vh; background-repeat: no-repeat; background-size:cover;">
+<div class="container">
 
-  
-    <!-- END Header -->
-    <div class="container">
+    <div class="gradient-div">
 
-        <div class="col-sm-4 div-container rounded-corner" >
-
-            <h1 class="centered-text">CJV Riyadh <br> Metro</h1>
-
-
-
-            <a href="/login/1/" class="centered-text-a">
-                <h3 class="centered-text">User Login</h3>
-            </a>
+        <div style="padding-top:10px ;">
+            <h1 class="centered-text-head">ASSET OPTIMA</h1>
         </div>
-          
-      
-    </div>
+
+        <div class="image-container">
+
+            <div class="container">
+
+                <div class="col-sm-4 div-container rounded-corner" >
     
+                    <h2 class="centered-text">CJV Riyadh Metro</h2>
+    
+    
+    
+                    <a href="/login/1/" class="centered-text-a">
+                        <h2 class="centered-text">User Login</h2>
+                    </a>
+                </div>
+                
+            
+            </div>
+
+        </div>
+
+        
+    </div>
+
+
+
 </div>
-<!-- END Container -->
+
 
 </body>
 </html>
