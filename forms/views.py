@@ -628,9 +628,9 @@ class AddFailureData(View):
         else:
             meg =''
             for i in DATA:
-                print('--------------------------')
+                print('---------------yyyyyyyyyyyyyyyyyyyy-----------')
                 print(i['field'])
-                if i['value'] != None:
+                if i['value'] != None and i['value'] != '' :
                     cursor.execute("SELECT * FROM fracas_failuredata WHERE id='{0}' and {1}='{2}'".format(ids,i['field'],i['value']))
                     row = cursor.fetchone()
                     print(row)
@@ -649,8 +649,9 @@ class AddFailureData(View):
                     row1 = cursor.fetchone()
                     if row1[0] != i['value']:
                         meg = meg +i['field']+': '+ str(row1[0]) +' to '+str(i['value'])+', '
-                  
+                print('---------------fffffffffffffffff-----------')
             if FailureData.objects.filter(failure_id=failure_id,is_active=0).exists():
+                print('---------------1111111111111111-----------')
                 if FailureData.objects.filter(failure_id=failure_id,id=ids,is_active=0).exists():
                     Find_Pids =PBSMaster.objects.filter(id=asset_type)
                     for Find_Pid in Find_Pids:
@@ -666,6 +667,7 @@ class AddFailureData(View):
                 else:
                     return JsonResponse({'status':'0'})
             else:
+                print('---------------2222222222222-----------')
                 Find_Pids =PBSMaster.objects.filter(id=asset_type)
                 for Find_Pid in Find_Pids:
                     FailureData.objects.filter(id=ids).update(P_id=Find_Pid.project_id,asset_config_id_id=asset_config_id,mode_id_id=mode_id,defect_id=defect,asset_type=asset_type,failure_id=failure_id,event_description=event_description,date=date,time=time,detection=detection,service_delay=service_delay,immediate_investigation=immediate_investigation,failure_type=failure_type,safety_failure=safety_failure,hazard_id=hazard_id,cm_description=cm_description,replaced_asset_config_id=replaced_asset_config_id,cm_start_date=cm_start_date,cm_start_time=cm_start_time,cm_end_date=cm_end_date,cm_end_time=cm_end_time,oem_failure_reference=oem_failure_reference)
