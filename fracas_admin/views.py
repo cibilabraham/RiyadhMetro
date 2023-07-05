@@ -51,6 +51,8 @@ class Login(View):
         if 'login' in request.session:
             return redirect('/dashboard/')
         id = kwargs.get("id")
+        if id != 1:
+            return redirect('index')
         return render(request, self.template_name,{'id':id})
 
     def post(self, request, *args, **kwargs):

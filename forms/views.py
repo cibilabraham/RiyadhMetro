@@ -31,7 +31,7 @@ class assetRegister(View):
         if user_Role == 1:
             location_id = Asset.objects.filter(is_active=0).distinct('location_id')
             asset_serial_number = Asset.objects.filter(is_active=0).distinct('asset_serial_number')
-            asset_type = PBSMaster.objects.filter(is_active=0)
+            asset_type = PBSMaster.objects.filter(is_active=0).order_by('asset_type') 
             asset_description = Asset.objects.filter(is_active=0).distinct('asset_description')
             software_version = Asset.objects.filter(is_active=0).distinct('software_version')
             software_description = Asset.objects.filter(is_active=0).distinct('software_description')
@@ -43,7 +43,7 @@ class assetRegister(View):
             software_version = Asset.objects.filter(is_active=0,P_id=P_id).distinct('software_version')
             software_description = Asset.objects.filter(is_active=0,P_id=P_id).distinct('software_description')
             asset_status = Asset.objects.filter(is_active=0,P_id=P_id).distinct('asset_status')
-            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id) 
+            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id).order_by('asset_type') 
         return render(request, self.template_name, {'asset_status':asset_status,'software_description':software_description, 'software_version':software_version, 'asset_description':asset_description, 'location_id' : location_id, 'asset_serial_number':asset_serial_number,'asset_type':asset_type})
 
     def post(self, request, *args, **kwargs):
@@ -161,9 +161,9 @@ class AddAsset(View):
                 }
             #print(data)
         if user_Role == 1:
-            asset_types = PBSMaster.objects.filter(is_active=0)
+            asset_types = PBSMaster.objects.filter(is_active=0).order_by('asset_type')
         else:
-            asset_types = PBSMaster.objects.filter(is_active=0,project_id=P_id)
+            asset_types = PBSMaster.objects.filter(is_active=0,project_id=P_id).order_by('asset_type')
         return render(request, self.template_name,{'data':data,'asset_types':asset_types})
 
     def post(self, request, *args, **kwargs):
@@ -293,17 +293,17 @@ class Failuredata(View):
         user_ID = request.session['user_ID']
         user_Role = request.session.get('user_Role')
         if user_Role == 1:
-            asset_type = FailureData.objects.all().distinct('asset_type')
+            asset_type = FailureData.objects.all().distinct('asset_type').order_by('asset_type')
             failure_type = FailureData.objects.all().distinct('failure_type')
             safety_failure = FailureData.objects.all().distinct('safety_failure')
             mode_id = FailureMode.objects.filter(is_active=0).distinct('mode_id')
-            asset_type = asset_types = PBSMaster.objects.filter(is_active=0)
+            asset_type = PBSMaster.objects.filter(is_active=0).order_by('asset_type')
         else:
-            asset_type = FailureData.objects.all().distinct('asset_type')
+            asset_type = FailureData.objects.all().distinct('asset_type').order_by('asset_type')
             failure_type = FailureData.objects.all().distinct('failure_type')
             safety_failure = FailureData.objects.all().distinct('safety_failure')
             mode_id = FailureMode.objects.filter(is_active=0,P_id=P_id).distinct('mode_id')
-            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id) 
+            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id).order_by('asset_type') 
         return render(request, self.template_name, {'asset_type':asset_type, 'failure_type':failure_type, 'safety_failure':safety_failure, 'mode_id' : mode_id})
 
     def post(self, request, *args, **kwargs):
@@ -511,12 +511,12 @@ class AddFailureData(View):
                 }
             #print(data)
         if user_Role == 1:
-            asset_types = PBSMaster.objects.filter(is_active=0)
+            asset_types = PBSMaster.objects.filter(is_active=0).order_by('asset_type')
             asset_config_id = Asset.objects.filter(is_active=0).distinct('asset_config_id')
             mode_id = FailureMode.objects.filter(is_active=0).distinct('mode_id')
             defect = Defect.objects.filter(is_active=0).distinct('defect_id')
         else:
-            asset_types = PBSMaster.objects.filter(is_active=0,project_id=P_id)
+            asset_types = PBSMaster.objects.filter(is_active=0,project_id=P_id).order_by('asset_type')
             asset_config_id = Asset.objects.filter(is_active=0,P_id=P_id).distinct('asset_config_id')
             mode_id = FailureMode.objects.filter(is_active=0,P_id=P_id).distinct('mode_id')
             defect = Defect.objects.filter(is_active=0,P_id=P_id).distinct('defect_id')
@@ -688,9 +688,9 @@ class Failuremode(View):
         user_ID = request.session['user_ID']
         user_Role = request.session.get('user_Role')
         if user_Role == 1:
-            asset_type = asset_types = PBSMaster.objects.filter(is_active=0)
+            asset_type = PBSMaster.objects.filter(is_active=0).order_by('asset_type')
         else:
-            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id) 
+            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id).order_by('asset_type') 
         return render(request, self.template_name, {'asset_type':asset_type})
 
     def post(self, request, *args, **kwargs):
@@ -813,12 +813,12 @@ class AddFailuremode(View):
                 }
             #print(data)
         if user_Role == 1:
-            asset_types = PBSMaster.objects.filter(is_active=0)
-            asset_type = PBSMaster.objects.filter(is_active=0)
+            asset_types = PBSMaster.objects.filter(is_active=0).order_by('asset_type')
+            asset_type = PBSMaster.objects.filter(is_active=0).order_by('asset_type')
             defect = Defect.objects.filter(is_active=0).distinct('defect_id')
         else:
-            asset_types = PBSMaster.objects.filter(is_active=0,project_id=P_id)
-            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id)
+            asset_types = PBSMaster.objects.filter(is_active=0,project_id=P_id).order_by('asset_type')
+            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id).order_by('asset_type')
             defect = Defect.objects.filter(is_active=0,P_id=P_id).distinct('defect_id')
         return render(request, self.template_name,{'data':data,'asset_type':asset_type,'defect':defect,'asset_types':asset_type})
     
@@ -1483,7 +1483,7 @@ class DefectsView(View):
         if user_Role == 1:
             defect_description = Defect.objects.filter(is_active=0).distinct('defect_description')
             investigation = Defect.objects.filter(is_active=0).distinct('investigation')
-            asset_type = PBSMaster.objects.filter(is_active=0)
+            asset_type = PBSMaster.objects.filter(is_active=0).order_by('asset_type')
             defect_status = Defect.objects.filter(is_active=0).distinct('defect_status')
             defect_status_remarks = Defect.objects.filter(is_active=0).distinct('defect_status_remarks')
             oem_defect_reference = Defect.objects.filter(is_active=0).distinct('oem_defect_reference')
@@ -1493,7 +1493,7 @@ class DefectsView(View):
             defect_status = Defect.objects.filter(is_active=0,P_id=P_id).distinct('defect_status')
             defect_status_remarks = Defect.objects.filter(is_active=0,P_id=P_id).distinct('defect_status_remarks')
             oem_defect_reference = Defect.objects.filter(is_active=0,P_id=P_id).distinct('oem_defect_reference')
-            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id) 
+            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id).order_by('asset_type') 
         return render(request, self.template_name, {'add':add,'defect_description':defect_description,'investigation':investigation, 'defect_status':defect_status, 'defect_status_remarks':defect_status_remarks, 'oem_defect_reference' : oem_defect_reference,'asset_type':asset_type,'asset_types':asset_type})
 
     def post(self, request, *args, **kwargs):
@@ -1993,10 +1993,10 @@ class AddRootcauseView(View):
                     'root_cause_description':a.root_cause_description,
                 }
         if user_Role == 1:
-            asset_type = PBSMaster.objects.filter(is_active=0)
+            asset_type = PBSMaster.objects.filter(is_active=0).order_by('asset_type')
             defect = Defect.objects.filter(is_active=0).distinct('defect_id')
         else:
-            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id)
+            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id).order_by('asset_type')
             defect = Defect.objects.filter(is_active=0,P_id=P_id).distinct('defect_id')
         return render(request, self.template_name,{'data':data,'asset_types':asset_type,'defect':defect})
     
@@ -2232,9 +2232,9 @@ class ReviewBoardView(View):
         user_ID = request.session['user_ID']
         user_Role = request.session.get('user_Role')
         if user_Role == 1:
-            asset_type = PBSMaster.objects.filter(is_active=0)
+            asset_type = PBSMaster.objects.filter(is_active=0).order_by('asset_type')
         else:
-            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id) 
+            asset_type = PBSMaster.objects.filter(is_active=0,project_id=P_id).order_by('asset_type') 
         return render(request, self.template_name, {'add':add,'asset_type':asset_type,'asset_types':asset_type})
 
     def post(self, request, *args, **kwargs):
