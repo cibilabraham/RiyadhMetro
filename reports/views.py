@@ -966,19 +966,15 @@ class LogPlotMtbfReportView(View):
 
                 week_end_date1 = datetime.datetime.strptime(str(week_end_date), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
                 
-                if week_end_date1 < Hightest_date_of_failure or failure_count != 0 :
-                    findUnit = PBSUnit.objects.filter()
-                    if findUnit[0].MTBFMTBSAF == 'days':
-                        if actual_mtbf_value != 'null':
-                            actual_mtbf_value = round(actual_mtbf_value/24,2)                        
-                    elif findUnit[0].MTBFMTBSAF == 'mins':
-                        if actual_mtbf_value != 'null':
-                            actual_mtbf_value = actual_mtbf_value *60
-                    else:
-                        actual_mtbf_value = actual_mtbf_value
+                findUnit = PBSUnit.objects.filter()
+                if findUnit[0].MTBFMTBSAF == 'days':
+                    if actual_mtbf_value != 'null':
+                        actual_mtbf_value = round(actual_mtbf_value/24,2)                        
+                elif findUnit[0].MTBFMTBSAF == 'mins':
+                    if actual_mtbf_value != 'null':
+                        actual_mtbf_value = actual_mtbf_value *60
                 else:
-                    actual_mtbf_value = 1
-
+                    actual_mtbf_value = actual_mtbf_value
                 last_x_point = lru_population_hours
                 last_y_point = actual_mtbf_value
                
@@ -1004,7 +1000,6 @@ class LogPlotMtbfReportView(View):
                 slope = 1
             else:
                 slope = (last_y_point - first_y_point) / (last_x_point - first_x_point)
-          
             print(slope,'slope')
             LinerPointFlow = 0
 
