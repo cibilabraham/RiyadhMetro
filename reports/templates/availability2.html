@@ -312,7 +312,7 @@
         var startDate = $('#startDate').val() ;
         var endDate = $('#endDate').val() ;
          $.ajax({
-          url: "/reports/availability/",
+          url: "/reports/availability2/",
           method: 'POST',
           dataType: 'json',
           headers: {'X-CSRFToken': '{{ csrf_token }}'},
