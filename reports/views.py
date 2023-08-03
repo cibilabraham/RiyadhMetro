@@ -1863,6 +1863,8 @@ class AvailabilityView(View):
         scale = []
         asset_types = []
         pbs_asset_types = []
+
+        print('======== Availability time View ')
         
         if req.get('start_date') !="" and req.get('end_date') !="":
             start_date = datetime.datetime.strptime(req.get('start_date'), '%d/%m/%Y').strftime('%Y-%m-%d')
@@ -2070,6 +2072,240 @@ class AvailabilityView(View):
                 
         response = {'Avaiability' : Avalability_data, 'availability_targets' : availability_target_data, 'rangeScale' : week_scale, 'scale':scale}
         return JsonResponse(response)
+    
+
+
+class Availability2View(View):
+    template_name = 'availability2.html'
+
+    def get(self, request, *args, **kwargs):
+        if 'login' not in request.session:
+            return redirect('index')
+        P_id = request.session['P_id']
+        user_ID = request.session['user_ID']
+        user_Role = request.session.get('user_Role')
+        if user_Role == 1:
+            project = Product.objects.filter(is_active=0)
+        else:
+            project = Product.objects.filter(product_id=P_id,is_active=0)
+        return render(request, self.template_name, {'project' : project})
+    
+    def post(self, request, *args, **kwargs):
+        req = request.POST
+        project = req.get('project')
+        system = req.get('system')
+        sub_system = req.get('sub_system')
+        FN_NAME = req.get('FN_NAME')
+        product_id = req.get('product_id')
+        lru_type = req.get('lru_type')
+        
+        Avalability_data=[]
+        availability_target_data=[]
+        week_scale=[]
+        scale = []
+        asset_types = []
+        pbs_asset_types = []
+        
+        if req.get('start_date') !="" and req.get('end_date') !="":
+            start_date = datetime.datetime.strptime(req.get('start_date'), '%d/%m/%Y').strftime('%Y-%m-%d')
+            end_date = datetime.datetime.strptime(req.get('end_date'), '%d/%m/%Y').strftime('%Y-%m-%d')
+        else:
+            start_date = req.get('start_date')
+            end_date = req.get('end_date')
+        pbs_mtbf_value = 0
+        P_id = request.session['P_id']
+        user_ID = request.session['user_ID']
+        user_Role = request.session.get('user_Role')
+        
+        if user_Role == 1:
+            Asset_data=Asset.objects.filter(is_active=0)
+        else:
+            Asset_data=Asset.objects.filter(is_active=0,P_id=P_id)
+        pbs_master_data = PBSMaster.objects.filter(is_active=0)
+        
+        if FN_NAME == 'two':
+            if project != "all":
+                if Asset_data.filter(asset_type=lru_type,is_active=0).exists():
+                    Asset_data=Asset_data.filter(asset_type=lru_type)
+                    pbs_master_data = pbs_master_data.filter(id=lru_type)
+                else:
+                    response = {'status':'1','Avaiability' : Avalability_data, 'availability_targets' : availability_target_data, 'rangeScale' : week_scale, 'scale':scale}
+                    return JsonResponse(response)    
+        elif FN_NAME == 'three':
+            if project != "all":
+                SUBSYSTEM=PBSMaster.objects.filter(project_id=project,is_active=0,system=system)
+                if not SUBSYSTEM.exists():
+                    response = {'status':'1','Avaiability' : Avalability_data, 'availability_targets' : availability_target_data, 'rangeScale' : week_scale, 'scale':scale}
+                    return JsonResponse(response)
+                a=[]
+                for SUB in SUBSYSTEM:
+                    a.append(SUB.id)
+                Asset_data=Asset_data.filter(asset_type__in=a) 
+                pbs_master_data = pbs_master_data.filter(id__in=a)
+        else:
+            if project != "all":
+                SUBSYSTEM=PBSMaster.objects.filter(project_id=project,is_active=0)
+                if not SUBSYSTEM.exists():
+                    response = {'status':'1','Avaiability' : Avalability_data, 'availability_targets' : availability_target_data, 'rangeScale' : week_scale, 'scale':scale}
+                    return JsonResponse(response)
+                a=[]
+                for SUB in SUBSYSTEM:
+                    a.append(SUB.id)
+                Asset_data=Asset_data.filter(asset_type__in=a) 
+                pbs_master_data = pbs_master_data.filter(id__in=a)
+                
+        if FN_NAME == 'two':
+            availability_target = pbs_master_data[0].availability_target
+        elif FN_NAME == 'three':
+            if Systems.objects.filter(project_id=project,System=system,is_active=0).exists():
+                D_availability_target = Systems.objects.filter(project_id=project,System=system,is_active=0) 
+                availability_target = D_availability_target[0].availability_target
+            else:
+                response = {'status':'2','Avaiability' : Avalability_data, 'availability_targets' : availability_target_data, 'rangeScale' : week_scale, 'scale':scale}
+                return JsonResponse(response)
+        else:
+            D_availability_target = Product.objects.filter(product_id=project) 
+            availability_target = D_availability_target[0].availability_target
+            
+        for ASSET in Asset_data:
+            asset_types.append(ASSET.asset_type)
+            
+        if (lru_type or asset_types) and asset_types!=['']:
+            if lru_type and lru_type!="all":
+                if not FailureData.objects.filter(asset_type=lru_type, date__range=[start_date,end_date],is_active=0).exclude(failure_type='Other').exists():
+                    response = {'status':'1','Avaiability' : Avalability_data, 'availability_targets' : availability_target_data, 'rangeScale' : week_scale, 'scale':scale}
+                    return JsonResponse(response)
+            else:
+                if not FailureData.objects.filter(asset_type__in=asset_types, date__range=[start_date,end_date],is_active=0).exclude(failure_type='Other').exists():
+                    response = {'status':'1','Avaiability' : Avalability_data, 'availability_targets' : availability_target_data, 'rangeScale' : week_scale, 'scale':scale}
+                    return JsonResponse(response)
+                
+            if lru_type and lru_type!="all":
+                if FailureData.objects.filter(asset_type=lru_type,is_active=0).exclude(failure_type='Other').exists():
+                    all_failure = FailureData.objects.filter(asset_type=lru_type,is_active=0).exclude(failure_type='Other')
+                    asset_count = Asset.objects.filter(asset_type=lru_type,is_active=0).count()
+                else:
+                    response = {'Avaiability' : Avalability_data, 'availability_targets' : availability_target_data, 'rangeScale' : week_scale, 'scale':scale}
+                    return JsonResponse(response)
+            else:
+                if FailureData.objects.filter(asset_type__in=asset_types,is_active=0).exclude(failure_type='Other').exists():
+                    all_failure = FailureData.objects.filter(asset_type__in=asset_types,is_active=0).exclude(failure_type='Other')
+                    asset_count = Asset.objects.filter(asset_type__in=asset_types,is_active=0).count()
+                else:
+                    response = {'Avaiability' : Avalability_data, 'availability_targets' : availability_target_data, 'rangeScale' : week_scale, 'scale':scale}
+                    return JsonResponse(response)
+            if FN_NAME == 'two':
+                fist_hrs = 7*24*asset_count
+            else:
+                fist_hrs = 7*24
+            
+            if start_date and end_date : # coming start date and end date are used further calculation
+                start_dates = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+                end_dates = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+            else:
+                start_dates = (date.today() - offsets.YearBegin()).date()
+                end_dates = (date.today() + offsets.YearEnd()).date()
+        
+            # print('Start:-',start_dates, 'End:-', end_dates)
+            first_week_day = start_dates.weekday()
+            first_week_sunday = start_dates + timedelta(days=(5-first_week_day))
+            second_week_start_date = first_week_sunday + timedelta(days=1)
+            number_of_days = (end_dates-second_week_start_date).days
+            if number_of_days % 7 == 0:
+                weeks = number_of_days//7
+            else:
+                weeks = number_of_days/7
+            if type(weeks)==float:
+                week_number = int(weeks) + 2
+            else:
+                week_number = weeks + 1 
+
+            if lru_type and lru_type!="all":
+                Hightest_date_of_failure = FailureData.objects.filter(asset_config_id__asset_type=lru_type, is_active=0).exclude(failure_type='Other').order_by('-date')
+            else:
+                Hightest_date_of_failure = FailureData.objects.filter(asset_config_id__asset_type__in=asset_types,is_active=0).exclude(failure_type='Other').order_by('-date')
+
+            print(Hightest_date_of_failure[0].date,'Hightest_date_of_failure')
+            Hightest_date_of_failure = str(Hightest_date_of_failure[0].date)
+            Hightest_date_of_failure = datetime.datetime.strptime(Hightest_date_of_failure, '%Y-%m-%d').strftime('%Y-%m-%d')
+           
+            for week in range(1, week_number+1):
+                if week == 1:
+                    week_start_date = start_dates
+                    
+                elif week == 2:
+                    week_start_date = second_week_start_date
+                else:
+                    week_start_date = week_end_date + timedelta(days=1)
+                if week ==1:
+                    week_end_date = first_week_sunday
+                else:
+                    week_end_date = week_start_date + timedelta(days=6) 
+                print("----------------------")
+                print(week_start_date,'week_start_date')
+                print(week_end_date,'week_end_date')
+                
+                time_period = week
+                if week == 1:
+                    cumulative_operating_hours = fist_hrs
+                else:
+                    cumulative_operating_hours = fist_hrs*week
+                if lru_type and lru_type!="all":
+                    if FailureData.objects.filter(asset_type=lru_type,is_active=0,date__range=[week_start_date,week_end_date]).exclude(failure_type='Other').exists():
+                        Find_Week_wise_Service_Delay1 = FailureData.objects.filter(asset_type=lru_type,is_active=0,date__range=[week_start_date,week_end_date]).exclude(failure_type='Other')
+                        Find_Week_wise_Service_Delay = sum([int(item.service_delay) for item in Find_Week_wise_Service_Delay1])
+                    else:
+                        Find_Week_wise_Service_Delay = None
+                else:
+                    if FailureData.objects.filter(asset_type__in=asset_types,is_active=0,date__range=[week_start_date,week_end_date]).exclude(failure_type='Other').exists():
+                        Find_Week_wise_Service_Delay1 = FailureData.objects.filter(asset_type__in=asset_types,is_active=0,date__range=[week_start_date,week_end_date]).exclude(failure_type='Other')
+                        Find_Week_wise_Service_Delay = sum([int(item.service_delay) for item in Find_Week_wise_Service_Delay1])
+
+                    else:
+                        Find_Week_wise_Service_Delay = None
+                if Find_Week_wise_Service_Delay == None:
+                    Week_wise_Service_Delay = 0
+                else:
+                    Week_wise_Service_Delay = Find_Week_wise_Service_Delay
+                    
+                # print(Week_wise_Service_Delay)
+                
+                Week_wise_Service_Delay_Hrs = Week_wise_Service_Delay/60
+                
+                # print(Week_wise_Service_Delay_Hrs)
+                
+                if week == 1:
+                    Cumulative_service_delay_Hrs = Week_wise_Service_Delay_Hrs
+                    Temp_Week_wise_Service_Delay_Hrs = Cumulative_service_delay_Hrs
+                else:
+                    Cumulative_service_delay_Hrs = Week_wise_Service_Delay_Hrs + Temp_Week_wise_Service_Delay_Hrs
+                    Temp_Week_wise_Service_Delay_Hrs = Cumulative_service_delay_Hrs
+                Up_Time_Hrs = cumulative_operating_hours - Cumulative_service_delay_Hrs
+                Avaiability = Up_Time_Hrs*100 / cumulative_operating_hours
+
+                print(week_end_date,'week_end_date')
+                week_end_date1 = datetime.datetime.strptime(str(week_end_date), '%Y-%m-%d').strftime('%Y-%m-%d')
+                print(Hightest_date_of_failure,'Hightest_date_of_failure')
+                if week_end_date1 < Hightest_date_of_failure or Find_Week_wise_Service_Delay != None:
+                    Avaiability = Avaiability
+                else:
+                    Avaiability = 'null'
+
+
+
+                # Avaiability = ((100 - Cumulative_service_delay_Hrs) / cumulative_operating_hours)
+                #Avaiability = random.randint(1,100)    
+                Avalability_data.append({'x':week, 'y':Avaiability,})
+                availability_target_data.append({'x':week, 'y':availability_target,})
+                week_scale.append(str(week))
+                print(time_period,cumulative_operating_hours,Week_wise_Service_Delay,Week_wise_Service_Delay_Hrs,Cumulative_service_delay_Hrs,Cumulative_service_delay_Hrs,Up_Time_Hrs,Avaiability,availability_target)
+                
+        response = {'Avaiability' : Avalability_data, 'availability_targets' : availability_target_data, 'rangeScale' : week_scale, 'scale':scale}
+        return JsonResponse(response)
+
+
+
+
     
 class ReviewBoardDetailsToPDFView(View):
     template_name = 'PDFreview_details.html'

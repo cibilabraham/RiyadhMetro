@@ -18,6 +18,7 @@ urlpatterns = [
     path('defect/',DefectTypes.as_view(),name='defect_get'),
     path('project/',Project.as_view(),name='project'),
     path('availability/',AvailabilityView.as_view(),name='availability'),
+    path('availability2/',Availability2View.as_view(),name='availability2'),
     
     path('review_details/PDF/',ReviewBoardDetailsToPDFView.as_view(),name='review_detailsPDF'),
 ]
