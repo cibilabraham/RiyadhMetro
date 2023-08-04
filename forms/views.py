@@ -63,6 +63,7 @@ class assetRegister(View):
         asset_status = req.get('asset_status')
         
         Asset_data =Asset.objects.filter(is_active=0)
+        print(Asset_data)
 
         if location_id != "all":
             Asset_data=Asset_data.filter(location_id=location_id)
@@ -81,9 +82,11 @@ class assetRegister(View):
     
         # Asset_data = Asset.objects.all()
         for Assets in Asset_data:
+            print(Assets.asset_type)
             if PBSMaster.objects.filter(id=Assets.asset_type,is_active=0).exists():
+                print('uuuuuuuu')
                 if user_Role == 1:
-                    PBSMaster_datas=PBSMaster.objects.filter(id=Assets.asset_type)
+                    PBSMaster_datas=PBSMaster.objects.filter(id=Assets.asset_type,is_active=0)
                     for PBSMaster_data in PBSMaster_datas:
                         data.append({ 
                             'asset_config_id' :  Assets.asset_config_id,
@@ -100,7 +103,7 @@ class assetRegister(View):
                         }) 
                 else:
                     if PBSMaster.objects.filter(id=Assets.asset_type,project_id=P_id,is_active=0).exists():
-                        PBSMaster_datas=PBSMaster.objects.filter(id=Assets.asset_type)
+                        PBSMaster_datas=PBSMaster.objects.filter(id=Assets.asset_type,is_active=0)
                         for PBSMaster_data in PBSMaster_datas:
                             data.append({ 
                                 'asset_config_id' :  Assets.asset_config_id,
@@ -115,6 +118,7 @@ class assetRegister(View):
                                 'id':Assets.id,
                                 'user_Role':user_Role
                             }) 
+        print(data)
         return JsonResponse({'data':data})
 
     
@@ -185,7 +189,7 @@ class AddAsset(View):
         ids = req.get('id')
         DATA = []
         HEAD = ["asset_config_id",'asset_serial_number','location_id','location_description','asset_type','software_version','asset_description','software_description','asset_status']
-        asst =PBSMaster.objects.filter(asset_type=asset_type)
+        asst =PBSMaster.objects.filter(asset_type=asset_type,is_active=0)
         for f in HEAD:
             if f == 'asset_type':
                 DATA.append({
@@ -202,7 +206,7 @@ class AddAsset(View):
             if Asset.objects.filter(asset_config_id=asset_config_id,is_active=0).exists():
                 return JsonResponse({'status':'0'})
             else:
-                Find_Pids =PBSMaster.objects.filter(asset_type=asset_type)
+                Find_Pids =PBSMaster.objects.filter(asset_type=asset_type,is_active=0)
                 for Find_Pid in Find_Pids:
                     r=Asset(P_id=Find_Pid.project_id,asset_config_id=asset_config_id,location_id=location_id,location_description=location_description,asset_serial_number=asset_serial_number,asset_type=Find_Pid.id,asset_description=asset_description,software_version=software_version,software_description=software_description,asset_status=asset_status)
                     r.save()
@@ -230,7 +234,7 @@ class AddAsset(View):
                     
             if Asset.objects.filter(asset_config_id=asset_config_id,is_active=0).exists():
                 if Asset.objects.filter(asset_config_id=asset_config_id, id=ids,is_active=0).exists():
-                    Find_Pids =PBSMaster.objects.filter(asset_type=asset_type)
+                    Find_Pids =PBSMaster.objects.filter(asset_type=asset_type,is_active=0)
                     for Find_Pid in Find_Pids:
                         Asset.objects.filter(id=ids).update(P_id=Find_Pid.project_id,location_id=location_id,location_description=location_description,asset_serial_number=asset_serial_number,asset_type=Find_Pid.id,asset_description=asset_description,software_version=software_version,software_description=software_description,asset_status=asset_status)
                         if meg !='':
@@ -248,7 +252,7 @@ class AddAsset(View):
                 if FailureData.objects.filter(asset_config_id=AFTER[0].asset_config_id,is_active=0).exists():
                     return JsonResponse({'status':'2'})
                 else:
-                    Find_Pids =PBSMaster.objects.filter(asset_type=asset_type)
+                    Find_Pids =PBSMaster.objects.filter(asset_type=asset_type,is_active=0)
                     for Find_Pid in Find_Pids:
                         Asset.objects.filter(id=ids).update(P_id=Find_Pid.project_id,asset_config_id=asset_config_id,location_id=location_id,location_description=location_description,asset_serial_number=asset_serial_number,asset_type=Find_Pid.id,asset_description=asset_description,software_version=software_version,software_description=software_description,asset_status=asset_status)
                         if meg !='':
@@ -2618,7 +2622,7 @@ class AddImportAssetReg(View):
                 if itemId in ids:
                     itemAssetType = items['asset_type']
                     itemasset_config_id = items['asset_config_id']
-                    Project = PBSMaster.objects.filter(asset_type=itemAssetType)
+                    Project = PBSMaster.objects.filter(asset_type=itemAssetType,is_active=0)
                     if Asset.objects.filter(asset_config_id=itemasset_config_id).exists():
                         Asset.objects.filter(asset_config_id=itemasset_config_id).update(is_active=0,P_id=Project[0].project_id,location_id=items['location_id'],location_description=items['location_description'],asset_serial_number=items['asset_serial_number'],asset_type=Project[0].id,asset_description=items['asset_description'],software_version=items['software_version'],software_description=items['software_description'],asset_status=items['asset_status'])
                         updated+=1
@@ -2840,9 +2844,14 @@ class ImportFailureData(View):
                     if mode_id != "":                        
                         if not FailureMode.objects.filter(mode_id=mode_id,is_active=0).exists():
                             mode_id_err = 'Invalid match'
+                    else:
+                        mode_id_err = 'Empty'
+
                     if defect != "": 
                         if not Defect.objects.filter(defect_id=defect,is_active=0).exists():
                             defect_err = 'Invalid match'
+                    else:
+                        defect_err = 'Empty'
                         
                     if failure_id == "":
                         failure_id_err = 'Empty'
@@ -3045,7 +3054,7 @@ class ImportFailureData(View):
 
                     # print(cm_end_time)
                         
-                    if failure_id_err != '1' or asset_type_err != '1' or asset_config_id_err != '1' or event_description_err != '1' or date_err != '1' or time_err != '1' or detection_err != '1' or service_delay_err != '1' or immediate_investigation_err != '1' or failure_type_err != '1' or safety_failure_err != '1' or hazard_id_err != '1' or cm_description_err != '1' or replaced_asset_config_id_err != '1' or cm_start_date_err != '1' or cm_start_time_err != '1' or cm_end_date_err != '1' or cm_end_time_err != '1' or oem_failure_reference_err != '1':
+                    if failure_id_err != '1' or asset_type_err != '1' or asset_config_id_err != '1' or event_description_err != '1' or date_err != '1' or time_err != '1' or detection_err != '1' or service_delay_err != '1' or immediate_investigation_err != '1' or failure_type_err != '1' or safety_failure_err != '1' or hazard_id_err != '1' or cm_description_err != '1' or replaced_asset_config_id_err != '1' or cm_start_date_err != '1' or cm_start_time_err != '1' or cm_end_date_err != '1' or cm_end_time_err != '1' or oem_failure_reference_err != '1' or mode_id_err != '1' or defect_err != '1':
                         err_status = '0'
                     data.append({
                         'id':row,
@@ -3313,6 +3322,7 @@ class ImportFailureData(View):
     #         return render(request, self.template_name, {"data":data ,"dataUpdate":dataUpdate,"dataAdd":dataAdd})
 
 
+
 class AddImportFailureData(View):
     template_name = 'import_failuredata.html'
     
@@ -3356,7 +3366,7 @@ class AddImportFailureData(View):
                     itemscm_end_time = None
                
                 if itemId in ids:
-                    Project = PBSMaster.objects.filter(asset_type=itemasset_type)
+                    Project = PBSMaster.objects.filter(asset_type=itemasset_type,is_active=0)
                     if not FailureMode.objects.filter(mode_id=itemmode_id,P_id=Project[0].project_id).exists():
                         itemmode_id = None
                     else:
@@ -3692,8 +3702,8 @@ class AddImportFailuremode(View):
                 if itemId in ids:
                     itemAssetType = items['asset_type']
                     itemmode_id = items['mode_id']
-                    if PBSMaster.objects.filter(asset_type=itemAssetType).exists():
-                        Project = PBSMaster.objects.filter(asset_type=itemAssetType)
+                    if PBSMaster.objects.filter(asset_type=itemAssetType,is_active=0).exists():
+                        Project = PBSMaster.objects.filter(asset_type=itemAssetType,is_active=0)
                         pj_id = Project[0].project_id
                         Asst.append(Project[0].id)
                     else:

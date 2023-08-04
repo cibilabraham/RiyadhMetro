@@ -2105,6 +2105,8 @@ class Availability2View(View):
         scale = []
         asset_types = []
         pbs_asset_types = []
+
+        print('--------- v2 ------------')
         
         if req.get('start_date') !="" and req.get('end_date') !="":
             start_date = datetime.datetime.strptime(req.get('start_date'), '%d/%m/%Y').strftime('%Y-%m-%d')
